@@ -14,8 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/code-innovator-zyx/gvm/cmd" // update to your module path
 	"github.com/spf13/cobra/doc"
+	"github.com/the-yex/gvm/cmd" // update to your module path
 )
 
 func main() {

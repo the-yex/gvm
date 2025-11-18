@@ -5,8 +5,8 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/code-innovator-zyx/gvm/internal/core"
-	"github.com/code-innovator-zyx/gvm/internal/version"
+	"github.com/the-yex/gvm/internal/core"
+	"github.com/the-yex/gvm/internal/version"
 	"io"
 	"strings"
 )

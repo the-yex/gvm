@@ -3,8 +3,8 @@ package core
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/code-innovator-zyx/gvm/internal/consts"
-	"github.com/code-innovator-zyx/gvm/internal/utils"
+	"github.com/the-yex/gvm/internal/consts"
+	"github.com/the-yex/gvm/internal/utils"
 	"io"
 	"os"
 )

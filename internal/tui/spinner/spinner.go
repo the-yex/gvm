@@ -12,7 +12,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/code-innovator-zyx/gvm/internal/core"
+	"github.com/the-yex/gvm/internal/core"
 )
 
 type errMsg error

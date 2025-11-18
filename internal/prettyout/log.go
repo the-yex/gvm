@@ -1,7 +1,7 @@
 package prettyout
 
 import (
-	"github.com/code-innovator-zyx/gvm/internal/prettyout/color"
+	"github.com/the-yex/gvm/internal/prettyout/color"
 	"io"
 )
 

@@ -24,8 +24,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
-	"github.com/code-innovator-zyx/gvm/internal/consts"
 	"github.com/mholt/archiver/v3"
+	"github.com/the-yex/gvm/internal/consts"
 	"io"
 	"net/http"
 	"os"
@@ -141,7 +141,7 @@ func NewReleaseUpdater() *ReleaseUpdater {
 	return new(ReleaseUpdater)
 }
 
-// CheckForUpdates verifies if newer version exists. https://api.github.com/repos/code-innovator-zyx/gvm/releases/latest
+// CheckForUpdates verifies if newer version exists. https://api.github.com/repos/the-yex/gvm/releases/latest
 func (up ReleaseUpdater) CheckForUpdates() (rel *Release, yes bool, err error) {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", consts.AUTHOR, consts.NAME)
 

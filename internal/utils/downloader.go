@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
-	progress2 "github.com/code-innovator-zyx/gvm/internal/tui/progress"
+	progress2 "github.com/the-yex/gvm/internal/tui/progress"
 	"io"
 	"io/fs"
 	"net/http"

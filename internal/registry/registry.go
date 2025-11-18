@@ -2,12 +2,12 @@ package registry
 
 import (
 	"fmt"
-	"github.com/code-innovator-zyx/gvm/internal/consts"
-	"github.com/code-innovator-zyx/gvm/internal/registry/autoindex"
-	"github.com/code-innovator-zyx/gvm/internal/registry/fancyindex"
-	"github.com/code-innovator-zyx/gvm/internal/registry/official"
-	"github.com/code-innovator-zyx/gvm/internal/version"
 	"github.com/spf13/viper"
+	"github.com/the-yex/gvm/internal/consts"
+	"github.com/the-yex/gvm/internal/registry/autoindex"
+	"github.com/the-yex/gvm/internal/registry/fancyindex"
+	"github.com/the-yex/gvm/internal/registry/official"
+	"github.com/the-yex/gvm/internal/version"
 	"maps"
 	"slices"
 	"strings"

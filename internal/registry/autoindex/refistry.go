@@ -2,9 +2,9 @@ package autoindex
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	"github.com/code-innovator-zyx/gvm/internal/registry/base"
-	"github.com/code-innovator-zyx/gvm/internal/registry/internal"
-	"github.com/code-innovator-zyx/gvm/internal/version"
+	"github.com/the-yex/gvm/internal/registry/base"
+	"github.com/the-yex/gvm/internal/registry/internal"
+	"github.com/the-yex/gvm/internal/version"
 	"strings"
 )
 

@@ -2,8 +2,8 @@ package color
 
 import (
 	"fmt"
-	"github.com/code-innovator-zyx/gvm/internal/prettyout/color/colorable"
 	"github.com/mattn/go-isatty"
+	"github.com/the-yex/gvm/internal/prettyout/color/colorable"
 	"io"
 	"os"
 	"strconv"

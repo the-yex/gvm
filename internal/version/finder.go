@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/code-innovator-zyx/gvm/internal/core"
+	"github.com/the-yex/gvm/internal/core"
 	"runtime"
 	"sort"
 )

@@ -46,10 +46,10 @@ gvm install 1.23  # 也可以直接指定版本安装
 ### 安装方式
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/code-innovator-zyx/gvm/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/the-yex/gvm/main/install.sh | bash
 
 # 如果没有科技访问github 可以使用gitee
-curl -sSL https://raw.githubusercontent.com/code-innovator-zyx/gvm/main/install.sh | bash -s -- --source gitee
+curl -sSL https://raw.githubusercontent.com/the-yex/gvm/main/install.sh | bash -s -- --source gitee
 ```
 
 ## 📋 快速上手
@@ -161,7 +161,15 @@ gvm config unset custom_setting
 │   └── utils/     # 工具函数
 └── pkg/           # 公共包
 ```
+## 🧭 开发路线图
 
+| 阶段      | 功能 | 状态 |
+|---------|------|------|
+| ✅ v1.0  | 基础命令体系 (list/install/use/uninstall/config) | 已完成 |
+| 🚧 v1.2 | `.gvmrc` 项目版本隔离 | 开发中 |
+| 🚧 v1.3 | `gvm doctor` 环境诊断工具 | 计划中 |
+| 🧩 v1.4 | Shell 自动补全、项目模板系统 | 计划中 |
+| 🧠 v2.0 | 插件系统与智能版本推荐 | 规划中 |
 ## 贡献
 
 欢迎贡献代码、报告问题或提出改进建议！请遵循以下步骤：
@@ -181,4 +189,4 @@ gvm config unset custom_setting
 如有任何问题或建议，请通过以下方式联系我们：
 
 - 项目维护者：[mortal](1003941268@qq.com)
-- GitHub Issues：[https://github.com/code-innovator-zyx/gvm/issues](https://github.com/code-innovator-zyx/gvm/issues)
+- GitHub Issues：[https://github.com/the-yex/gvm/issues](https://github.com/the-yex/gvm/issues)

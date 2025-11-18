@@ -4,8 +4,8 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/code-innovator-zyx/gvm/internal/consts"
 	"github.com/spf13/viper"
+	"github.com/the-yex/gvm/internal/consts"
 	"os"
 	"strings"
 

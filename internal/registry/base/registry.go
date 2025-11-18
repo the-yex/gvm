@@ -3,7 +3,7 @@ package base
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/code-innovator-zyx/gvm/internal/version"
+	"github.com/the-yex/gvm/internal/version"
 	"net/http"
 	"net/url"
 	"time"

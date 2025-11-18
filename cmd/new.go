@@ -5,8 +5,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/code-innovator-zyx/gvm/pkg"
 	"github.com/spf13/cobra"
+	"github.com/the-yex/gvm/pkg"
 	"os"
 	"os/exec"
 	"path/filepath"

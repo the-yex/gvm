@@ -20,8 +20,8 @@
 package internal
 
 import (
-	"github.com/code-innovator-zyx/gvm/internal/utils"
-	"github.com/code-innovator-zyx/gvm/internal/version"
+	"github.com/the-yex/gvm/internal/utils"
+	"github.com/the-yex/gvm/internal/version"
 	"regexp"
 	"strings"
 )

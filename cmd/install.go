@@ -5,8 +5,8 @@ package cmd
 
 import (
 	"errors"
-	"github.com/code-innovator-zyx/gvm/internal/core"
 	"github.com/spf13/cobra"
+	"github.com/the-yex/gvm/internal/core"
 	"os"
 )
 

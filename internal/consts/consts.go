@@ -16,7 +16,7 @@ import (
 const (
 	NAME    = "gvm"
 	Version = "1.1.1"
-	AUTHOR  = "code-innovator-zyx"
+	AUTHOR  = "the-yex"
 )
 
 var (

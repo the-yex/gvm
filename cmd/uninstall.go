@@ -4,8 +4,8 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/code-innovator-zyx/gvm/internal/core"
 	"github.com/spf13/cobra"
+	"github.com/the-yex/gvm/internal/core"
 )
 
 // uninstallCmd represents the uninstall command

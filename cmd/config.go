@@ -5,11 +5,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/code-innovator-zyx/gvm/internal/consts"
-	"github.com/code-innovator-zyx/gvm/internal/prettyout"
-	"github.com/code-innovator-zyx/gvm/internal/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/the-yex/gvm/internal/consts"
+	"github.com/the-yex/gvm/internal/prettyout"
+	"github.com/the-yex/gvm/internal/utils"
 	"os"
 	"reflect"
 	"slices"

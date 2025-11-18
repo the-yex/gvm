@@ -50,7 +50,7 @@ install_gvm() {
     os=$(get_os)
     arch=$(get_arch)
     dest_file="${GVM_HOME}/gvm${GVM_RELEASE}.${os}-${arch}.tar.gz"
-    url="https://${SOURCE}/code-innovator-zyx/gvm/releases/download/v${GVM_RELEASE}/gvm${GVM_RELEASE}.${os}-${arch}.tar.gz"
+    url="https://${SOURCE}/the-yex/gvm/releases/download/v${GVM_RELEASE}/gvm${GVM_RELEASE}.${os}-${arch}.tar.gz"
 
     echo "[1/3] Downloading ${url}"
     mkdir -p "${GVM_HOME}"

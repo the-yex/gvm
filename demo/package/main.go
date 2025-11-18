@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/code-innovator-zyx/gvm/internal/tui/pipeline"
+	"github.com/the-yex/gvm/internal/tui/pipeline"
 	"os"
 )
 

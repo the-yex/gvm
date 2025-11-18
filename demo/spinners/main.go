@@ -6,7 +6,7 @@ package main
 import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/code-innovator-zyx/gvm/internal/tui/spinner"
+	"github.com/the-yex/gvm/internal/tui/spinner"
 	"os"
 )
 

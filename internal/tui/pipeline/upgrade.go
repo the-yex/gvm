@@ -3,7 +3,7 @@ package pipeline
 import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/code-innovator-zyx/gvm/internal/github"
+	"github.com/the-yex/gvm/internal/github"
 )
 
 const (

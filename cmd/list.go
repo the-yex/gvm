@@ -5,10 +5,10 @@ package cmd
 
 import (
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/code-innovator-zyx/gvm/internal/consts"
-	list2 "github.com/code-innovator-zyx/gvm/internal/tui/list"
-	"github.com/code-innovator-zyx/gvm/pkg"
 	"github.com/spf13/cobra"
+	"github.com/the-yex/gvm/internal/consts"
+	list2 "github.com/the-yex/gvm/internal/tui/list"
+	"github.com/the-yex/gvm/pkg"
 	"slices"
 )
 

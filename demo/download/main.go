@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/code-innovator-zyx/gvm/internal/utils"
+	"github.com/the-yex/gvm/internal/utils"
 	"os"
 )
 

@@ -1,4 +1,4 @@
-module github.com/code-innovator-zyx/gvm
+module github.com/the-yex/gvm
 
 go 1.24.0
 

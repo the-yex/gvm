@@ -4,8 +4,8 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/code-innovator-zyx/gvm/internal/tui/pipeline"
 	"github.com/spf13/cobra"
+	"github.com/the-yex/gvm/internal/tui/pipeline"
 )
 
 // upgradeCmd represents the upgrade command

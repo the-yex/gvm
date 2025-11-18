@@ -6,9 +6,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/code-innovator-zyx/gvm/internal/consts"
-	"github.com/code-innovator-zyx/gvm/pkg"
 	"github.com/spf13/cobra"
+	"github.com/the-yex/gvm/internal/consts"
+	"github.com/the-yex/gvm/pkg"
 	"os"
 	"regexp"
 )

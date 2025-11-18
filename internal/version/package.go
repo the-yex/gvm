@@ -2,9 +2,9 @@ package version
 
 import (
 	"fmt"
-	"github.com/code-innovator-zyx/gvm/internal/consts"
-	"github.com/code-innovator-zyx/gvm/internal/utils"
 	"github.com/mholt/archiver/v3"
+	"github.com/the-yex/gvm/internal/consts"
+	"github.com/the-yex/gvm/internal/utils"
 	"io"
 	"os"
 	"path/filepath"
