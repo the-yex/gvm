@@ -241,16 +241,16 @@ golang  版本解析
 */
 
 func NewGoVersion(versionName string, opts ...func(v *Version)) (*Version, error) {
-	versionName = strings.TrimPrefix(versionName, "go")
-	// 预发布标识
+	vName := strings.TrimPrefix(versionName, "go")
 	preTags := []string{"alpha", "beta", "rc"}
 	for _, tag := range preTags {
-		if idx := strings.Index(versionName, tag); idx > 0 {
-			versionName = versionName[:idx] + "-" + versionName[idx:]
+		if idx := strings.Index(vName, tag); idx > 0 {
+			vName = vName[:idx] + "-" + vName[idx:]
 			break
 		}
 	}
-	version, err := NewVersion(versionName)
+	version, err := NewVersion(vName)
+	version.original = versionName
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,6 @@ func NewGoVersion(versionName string, opts ...func(v *Version)) (*Version, error
 // implementation.
 func (v Version) String() string {
 	var buf bytes.Buffer
-
 	fmt.Fprintf(&buf, "%d.%d.%d", v.major, v.minor, v.patch)
 	if v.pre != "" {
 		fmt.Fprintf(&buf, "-%s", v.pre)
@@ -374,7 +373,7 @@ func (v *Version) findArtifact() (artifactInfo ArtifactInfo, err error) {
 		goos   = runtime.GOOS
 		goarch = runtime.GOARCH
 	)
-	prefix := fmt.Sprintf("go%s.%s-%s", v.String(), goos, goarch)
+	prefix := fmt.Sprintf("%s.%s-%s", v.original, goos, goarch)
 	for i := range v.Artifacts {
 		if !strings.EqualFold(string(v.Artifacts[i].Kind), string(kind)) || !strings.HasPrefix(v.Artifacts[i].FileName, prefix) {
 			continue

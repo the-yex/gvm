@@ -55,7 +55,7 @@ func (r Registry) artifacts(table *goquery.Selection) (artifacts []version.Artif
 
 // StableVersions 返回所有稳定版本
 func (r Registry) StableVersions() (versions []*version.Version, err error) {
-	versions = make([]*version.Version, 0, 10) // 预分配空间，减少扩容
+	versions = make([]*version.Version, 0, 50)
 	var divs *goquery.Selection
 	if r.hasUnstableVersions() {
 		divs = r.base.Doc.Find("#stable").NextUntil("#unstable")
@@ -74,7 +74,7 @@ func (r Registry) hasUnstableVersions() bool {
 
 // UnstableVersions 返回所有不稳定版本
 func (r Registry) UnstableVersions() (versions []*version.Version, err error) {
-	versions = make([]*version.Version, 0, 5) // 预分配空间，减少扩容
+	versions = make([]*version.Version, 0, 5)
 	divs := r.base.Doc.Find("#unstable").NextUntil("#archive")
 	err = r.parseVersions(divs, &versions)
 	return versions, err
@@ -82,7 +82,7 @@ func (r Registry) UnstableVersions() (versions []*version.Version, err error) {
 
 // ArchivedVersions 返回所有归档版本
 func (r Registry) ArchivedVersions() (versions []*version.Version, err error) {
-	versions = make([]*version.Version, 0, 20) // 预分配空间，减少扩容
+	versions = make([]*version.Version, 0, 50)
 	divs := r.base.Doc.Find("#archive").Find("div.toggle")
 	err = r.parseVersions(divs, &versions)
 	return versions, err
@@ -95,7 +95,6 @@ func (r Registry) parseVersions(divs *goquery.Selection, versions *[]*version.Ve
 		if !ok {
 			return true
 		}
-
 		var v *version.Version
 		if v, err = version.NewGoVersion(
 			versionName,

@@ -143,6 +143,7 @@ func (artifactInfo ArtifactInfo) MultiWriterInstall(version string, writer io.Wr
 		return fmt.Errorf("resource(%s) download failed ==> %s", artifactInfo.URL, err.Error())
 	}
 	defer f.Close()
+	fmt.Println(artifactInfo.URL)
 	_, err = utils.Download(artifactInfo.URL, io.MultiWriter(f, writer), fn)
 	if nil != err {
 		return err
