@@ -55,17 +55,7 @@ type SimpleListModel struct {
 }
 type ChoiceHandler func(choice string)
 
-func NewSimpleListModel(list list.Model) SimpleListModel {
-	list.Styles.Title = titleStyle
-	list.Styles.HelpStyle = helpStyle
-	list.Styles.PaginationStyle = paginationStyle
-	return SimpleListModel{list: list}
-}
 func newSimpleListProgram(items []list.Item, title string, options ...tea.ProgramOption) *tea.Program {
-	//listItems := make([]list.Item, 0, len(items))
-	//for _, s := range items {
-	//	listItems = append(listItems, SimpleListItem(s))
-	//}
 	l := list.New(items, SimpleListItemDelegate{}, 20, SimpleListHeight)
 	l.Title = title
 	l.SetShowStatusBar(false)
