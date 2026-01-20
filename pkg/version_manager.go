@@ -151,11 +151,11 @@ type remote struct {
 func (r remote) mergeInstalled(remoteVers []*version.Version, localVers []*version.Version) {
 	m := make(map[string]*version.Version)
 	for _, v := range localVers {
-		m[v.Original()] = v // 用原始版本号做 key
+		m[v.String()] = v // 用原始版本号做 key
 	}
 	for _, v := range remoteVers {
 		v.Path = consts.VERSION_DIR
-		if lv, ok := m[v.Original()]; ok {
+		if lv, ok := m[v.String()]; ok {
 			v.Installed = true
 			v.CurrentUsed = lv.CurrentUsed
 			v.Path = lv.Path
