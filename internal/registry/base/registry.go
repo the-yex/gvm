@@ -22,21 +22,21 @@ type Registry struct {
 	Doc *goquery.Document
 }
 
-func NewBaseRegistry(mirrorUrl string) (*Registry, error) {
+func NewBaseRegistry(mirrorUrl string, timeout time.Duration) (*Registry, error) {
 	r := &Registry{url: mirrorUrl}
 	u, err := url.Parse(mirrorUrl)
 	if err != nil {
 		return nil, err
 	}
 	r.Url = u
-	err = r.loadDocument()
+	err = r.loadDocument(timeout)
 	if err != nil {
 		return nil, err
 	}
 	return r, nil
 }
-func (r *Registry) loadDocument() error {
-	client := &http.Client{Timeout: 5 * time.Second}
+func (r *Registry) loadDocument(timeout time.Duration) error {
+	client := &http.Client{Timeout: timeout}
 	req, err := http.NewRequest(http.MethodGet, r.url, nil)
 	if err != nil {
 		return fmt.Errorf("invalid request for %s: %w", r.url, err)

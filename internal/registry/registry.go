@@ -11,6 +11,7 @@ import (
 	"maps"
 	"slices"
 	"strings"
+	"time"
 )
 
 /*
@@ -46,6 +47,11 @@ var Mirrors = map[string]MirrorType{
 	"https://mirrors.ustc.edu.cn/golang/": USTC,
 }
 
+type RegistryOption struct {
+	Timeout time.Duration
+	Mirror  string // Override config mirror
+}
+
 type Registry interface {
 	// StableVersions 返回所有稳定版本
 	StableVersions() (versions []*version.Version, err error)
@@ -57,8 +63,11 @@ type Registry interface {
 	AllVersions() (versions []*version.Version, err error)
 }
 
-func NewRegistry() (Registry, error) {
-	mirrorUrl := viper.GetString(consts.CONFIG_MIRROR)
+func NewRegistry(opts RegistryOption) (Registry, error) {
+	mirrorUrl := opts.Mirror
+	if mirrorUrl == "" {
+		mirrorUrl = viper.GetString(consts.CONFIG_MIRROR)
+	}
 	mirror, exist := Mirrors[mirrorUrl]
 	if !exist {
 		supported := slices.SortedStableFunc(maps.Keys(Mirrors), func(s string, s2 string) int {
@@ -72,10 +81,10 @@ func NewRegistry() (Registry, error) {
 	}
 	switch mirror {
 	case Official, CNOfficial:
-		return official.NewRegistry(mirrorUrl)
+		return official.NewRegistry(mirrorUrl, opts.Timeout)
 	case USTC:
-		return autoindex.NewRegistry(mirrorUrl)
+		return autoindex.NewRegistry(mirrorUrl, opts.Timeout)
 	default:
-		return fancyindex.NewRegistry(mirrorUrl)
+		return fancyindex.NewRegistry(mirrorUrl, opts.Timeout)
 	}
 }

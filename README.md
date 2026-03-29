@@ -67,6 +67,15 @@ gvm list -r
 gvm list -r -t stable
 gvm list -r -t unstable
 gvm list -r -t archived
+
+# 指定超时时间（解决网络慢导致的超时问题）
+gvm list -r -T 30s
+
+# 临时指定镜像源（不保存到配置）
+gvm list -r -m https://mirrors.aliyun.com/golang/
+
+# 同时指定超时和镜像源
+gvm list -r -T 30s -m https://mirrors.ustc.edu.cn/golang/
 ```
 
 ### 安装Go版本

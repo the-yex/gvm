@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 )
 
 /*
@@ -32,9 +33,14 @@ import (
 * @Package:
  */
 
+type ListOption struct {
+	Timeout time.Duration
+	Mirror  string
+}
+
 type VManager interface {
 	// List 列出所有版本号
-	List(kind consts.VersionKind) ([]*version.Version, error)
+	List(kind consts.VersionKind, opts ListOption) ([]*version.Version, error)
 	// Install 安装指定版本号到本地
 	Install(versionName string) error
 	// Uninstall 从本地卸载指定版本号func DownloadFile(srcURL, filename string, flag int, perm fs.FileMode) (int64, error) {
@@ -72,7 +78,7 @@ func NewVManager(r bool, opts ...func(option *ManagerOption)) VManager {
 type local struct {
 }
 
-func (l local) List(kind consts.VersionKind) ([]*version.Version, error) {
+func (l local) List(kind consts.VersionKind, opts ListOption) ([]*version.Version, error) {
 	goRoots := viper.GetStringSlice(consts.CONFIG_GOROOT)
 	currentVersion := l.currentUsedVersion()
 	if len(goRoots) == 0 {
@@ -164,13 +170,17 @@ func (r remote) mergeInstalled(remoteVers []*version.Version, localVers []*versi
 	}
 }
 
-func (r remote) List(kind consts.VersionKind) (versions []*version.Version, err error) {
+func (r remote) List(kind consts.VersionKind, opts ListOption) (versions []*version.Version, err error) {
 	p := core.NewSpinnerProgram(tea.WithAltScreen())
 	wg := sync.WaitGroup{}
 	wg.Go(func() {
 		p.Run()
 	})
-	rg, err := registry.NewRegistry()
+	regOpts := registry.RegistryOption{Timeout: opts.Timeout, Mirror: opts.Mirror}
+	if regOpts.Timeout == 0 {
+		regOpts.Timeout = 5 * time.Second
+	}
+	rg, err := registry.NewRegistry(regOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +195,7 @@ func (r remote) List(kind consts.VersionKind) (versions []*version.Version, err 
 		versions, err = rg.AllVersions()
 	}
 	if r.withLocal {
-		installVersions, _ := local{}.List(kind)
+		installVersions, _ := local{}.List(kind, opts)
 		r.mergeInstalled(versions, installVersions)
 	}
 	p.Send(tea.Quit())
@@ -194,7 +204,7 @@ func (r remote) List(kind consts.VersionKind) (versions []*version.Version, err 
 }
 
 func (r remote) Install(versionName string) error {
-	versions, err := (&remote{withLocal: false}).List(consts.All)
+	versions, err := (&remote{withLocal: false}).List(consts.All, ListOption{})
 	if err != nil {
 		return err
 	}
@@ -262,7 +272,7 @@ func LocalInstalled(versionName string) *version.Version {
 	if versionName == "" {
 		return nil
 	}
-	installVersions, _ := local{}.List(consts.All)
+	installVersions, _ := local{}.List(consts.All, ListOption{})
 	for _, installVersion := range installVersions {
 		if installVersion.String() == versionName {
 			return installVersion

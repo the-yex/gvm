@@ -10,6 +10,7 @@ import (
 	list2 "github.com/the-yex/gvm/internal/tui/list"
 	"github.com/the-yex/gvm/pkg"
 	"slices"
+	"time"
 )
 
 // listCmd represents the list command
@@ -34,7 +35,11 @@ Example:
 			}
 		}
 
-		versions, err := pkg.NewVManager(remote, pkg.WithLocal()).List(vk)
+		timeout, _ := cmd.Flags().GetDuration("timeout")
+		mirror, _ := cmd.Flags().GetString("mirror")
+		opts := pkg.ListOption{Timeout: timeout, Mirror: mirror}
+
+		versions, err := pkg.NewVManager(remote, pkg.WithLocal()).List(vk, opts)
 		if err != nil {
 			return err
 		}
@@ -56,4 +61,6 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 	listCmd.Flags().BoolP("remote", "r", false, "List remote Go versions")
 	listCmd.Flags().StringP("type", "t", string(consts.All), "Version type (default all): stable | unstable | archived ")
+	listCmd.Flags().DurationP("timeout", "T", 5*time.Second, "HTTP timeout for fetching remote versions")
+	listCmd.Flags().StringP("mirror", "m", "", "Override mirror URL (temporary, does not save to config)")
 }

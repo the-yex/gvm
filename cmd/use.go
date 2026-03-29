@@ -35,7 +35,7 @@ Examples:
 		} else {
 			version = args[0]
 		}
-		localVersions, _ := pkg.NewVManager(false).List(consts.All)
+		localVersions, _ := pkg.NewVManager(false).List(consts.All, pkg.ListOption{})
 		for _, localVersion := range localVersions {
 			if localVersion.String() == version {
 				if err := pkg.SwitchVersion(localVersion.LocalDir()); err != nil {

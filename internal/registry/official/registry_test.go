@@ -3,6 +3,7 @@ package official
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 /*
@@ -14,7 +15,7 @@ import (
 const OfficialDownloadPageURL = "https://golang.google.cn/dl/"
 
 func Test_Parse(t *testing.T) {
-	r, err := NewRegistry(OfficialDownloadPageURL)
+	r, err := NewRegistry(OfficialDownloadPageURL, 10*time.Second)
 	if nil != err {
 		panic(err)
 	}

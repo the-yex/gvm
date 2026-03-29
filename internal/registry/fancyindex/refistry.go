@@ -6,6 +6,7 @@ import (
 	"github.com/the-yex/gvm/internal/registry/internal"
 	"github.com/the-yex/gvm/internal/version"
 	"strings"
+	"time"
 )
 
 /*
@@ -19,8 +20,8 @@ type Registry struct {
 	base *base.Registry
 }
 
-func NewRegistry(mirrorUrl string) (*Registry, error) {
-	baseRegistry, err := base.NewBaseRegistry(mirrorUrl)
+func NewRegistry(mirrorUrl string, timeout time.Duration) (*Registry, error) {
+	baseRegistry, err := base.NewBaseRegistry(mirrorUrl, timeout)
 	if err != nil {
 		return nil, err
 	}
