@@ -2,12 +2,13 @@ package version
 
 import (
 	"fmt"
-	"github.com/mholt/archiver/v3"
-	"github.com/the-yex/gvm/internal/consts"
-	"github.com/the-yex/gvm/internal/utils"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/mholt/archiver/v3"
+	"github.com/the-yex/gvm/internal/consts"
+	"github.com/the-yex/gvm/internal/utils"
 )
 
 /*
@@ -143,7 +144,6 @@ func (artifactInfo ArtifactInfo) MultiWriterInstall(version string, writer io.Wr
 		return fmt.Errorf("resource(%s) download failed ==> %s", artifactInfo.URL, err.Error())
 	}
 	defer f.Close()
-	fmt.Println(artifactInfo.URL)
 	_, err = utils.Download(artifactInfo.URL, io.MultiWriter(f, writer), fn)
 	if nil != err {
 		return err

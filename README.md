@@ -1,201 +1,288 @@
-# GVM - Go Version Manager
+<h1 align="center">GVM - Go Version Manager</h1>
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+<p align="center">
+  <strong>简单、快速、优雅的 Go 版本管理工具</strong>
+</p>
 
-**GVM** 是一款集 **Go 版本管理** 与 **项目管理** 于一体的开发工具，类似 Node.js 的 `nvm` 和 Rust 的 `cargo`。作者结合多种包管理器的经验设计了这款工具，让你在同一台机器上轻松安装、管理和切换多个 Go 版本，非常适合需要在不同项目中使用不同 Go 版本的开发者。
+<p align="center">
+  <a href="https://github.com/the-yex/gvm/releases">
+    <img src="https://img.shields.io/github/v/release/the-yex/gvm?style=flat-square" alt="GitHub Release">
+  </a>
+  <a href="https://github.com/the-yex/gvm/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/the-yex/gvm?style=flat-square" alt="License">
+  </a>
+  <a href="https://golang.org">
+    <img src="https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat-square&logo=go" alt="Go Version">
+  </a>
+  <a href="https://github.com/the-yex/gvm/issues">
+    <img src="https://img.shields.io/github/issues/the-yex/gvm?style=flat-square" alt="Issues">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#安装">安装</a> •
+  <a href="#快速上手">快速上手</a> •
+  <a href="#功能特性">功能特性</a> •
+  <a href="#命令参考">命令参考</a> •
+  <a href="#镜像源">镜像源</a> •
+  <a href="docs/cli/gvm.md">文档</a> •
+  <a href="CONTRIBUTING.md">贡献</a>
+</p>
 
 ---
 
+## 为什么选择 GVM？
 
-- **Go** - 核心语言
-- [**Cobra**](https://github.com/spf13/cobra) **v1.10.1** - 强大的现代 CLI 框架
-- Go 标准库
+如果你曾在不同项目中使用不同 Go 版本，你一定遇到过版本切换的烦恼。GVM 专为解决这个问题而设计：
 
----
-- **版本管理**
-    - `gvm list` – 列出本地或远程 Go 版本（支持交互式操作）
-    - `gvm install` – 安装指定版本
-    - `gvm use` – 切换 Go 版本
-    - `gvm uninstall` – 卸载指定版本
-    - `gvm upgrade` – 更新 GVM 本身
-- **项目管理**
-    - `gvm new` – 创建新项目，可指定 Go 版本与 module(后期期望指定模板初始化项目)
-- **配置管理**
-    - `gvm config` – 查看、设置和删除 GVM 配置项
----
-##  相关截图
-```shell
-gvm ls   # 列举本地已安装的版本号
+| 特性 | GVM | 原生安装 |
+|------|-----|---------|
+| 多版本共存 | ✅ 轻松管理 | ❌ 手动折腾 |
+| 版本切换 | ✅ 一条命令 | ❌ 修改 PATH |
+| 交互式 TUI | ✅ 可视化操作 | ❌ 无 |
+| 镜像加速 | ✅ 国内友好 | ⚠️ 需手动配置 |
+| 项目隔离 | 🚧 开发中 | ❌ 无 |
 
-# 可以移动上下游标，可以过滤版本号,相关快捷键如下
-#↑/k up • ↓/j down • / filter • x uninstall • u use • q quit • ? more
-```
-![gvm list](/docs/images/ls.png)
-```shell
-gvm ls -r  # 获取golang官网支持的所有版本号
-```
-![gvm list -r](/docs/images/ls-r.png)
-![gvm list install](/docs/images/ls-install.png)
+> 💡 **适合人群**：需要在多个项目中切换 Go 版本的开发者、Go 语言学习者、需要测试不同版本兼容性的库开发者
 
-```shell
-gvm install 1.23  # 也可以直接指定版本安装
-```
-![gvm install](/docs/images/install.png)
-## 安装工具
+## 安装
 
-### 安装方式
+### 一键安装（推荐）
 
 ```bash
+# GitHub 源（推荐）
 curl -sSL https://raw.githubusercontent.com/the-yex/gvm/main/install.sh | bash
 
-# 如果没有科技访问github 可以使用gitee
+# Gitee 源（国内加速）
 curl -sSL https://raw.githubusercontent.com/the-yex/gvm/main/install.sh | bash -s -- --source gitee
 ```
 
-## 📋 快速上手
-
-### 列出Go版本(当前已支持在列表页交互式安装使用和卸载)
+安装完成后，重启终端或执行：
 
 ```bash
-# 列出本地已安装的Go版本
+source ~/.bashrc  # 或 source ~/.zshrc
+```
+
+### 手动安装
+
+从 [Releases](https://github.com/the-yex/gvm/releases) 页面下载对应平台的压缩包：
+
+```bash
+# 解压到 ~/.gvm 目录
+mkdir -p ~/.gvm && tar -xzf gvm*.tar.gz -C ~/.gvm
+
+# 配置环境变量（添加到 ~/.bashrc 或 ~/.zshrc）
+export GVM_HOME="${HOME}/.gvm"
+export GOROOT="${GVM_HOME}/go"
+export PATH="${GVM_HOME}:${GOROOT}/bin:$PATH"
+```
+
+### 支持的平台
+
+| 平台 | 架构 |
+|------|------|
+| macOS | amd64, arm64 |
+| Linux | 386, amd64, arm, arm64, s390x, riscv64 |
+
+## 快速上手
+
+### 1️⃣ 查看可用版本
+
+```bash
+# 查看本地已安装版本（交互式 TUI）
 gvm list
 
-# 列出远程可用的Go版本
+# 查看远程所有可用版本
 gvm list -r
 
-# 列出特定类型的Go版本（稳定版、非稳定版或归档版）
-gvm list -r -t stable
-gvm list -r -t unstable
-gvm list -r -t archived
-
-# 指定超时时间（解决网络慢导致的超时问题）
-gvm list -r -T 30s
-
-# 临时指定镜像源（不保存到配置）
-gvm list -r -m https://mirrors.aliyun.com/golang/
-
-# 同时指定超时和镜像源
-gvm list -r -T 30s -m https://mirrors.ustc.edu.cn/golang/
+# 按类型筛选
+gvm list -r -t stable      # 仅稳定版
+gvm list -r -t unstable    # 仅非稳定版
+gvm list -r -t archived    # 已归档版本
 ```
 
-### 安装Go版本
+### 2️⃣ 安装 Go 版本
 
 ```bash
-# 安装特定版本的Go
-gvm install go1.21
+# 安装指定版本（支持模糊匹配）
+gvm install 1.23      # 自动匹配最新 1.23.x
+gvm install go1.21.0  # 精确版本
+gvm install latest    # 最新稳定版
 ```
 
-### 切换Go版本
+### 3️⃣ 切换版本
 
 ```bash
-# 切换到特定版本的Go
-gvm use go1.21
+# 切换到指定版本
+gvm use 1.21
+
+# 验证
+go version
 ```
 
-### 卸载Go版本
+### 4️⃣ 交互式操作
+
+在 `gvm list` 或 `gvm list -r` 的交互界面中：
+
+| 按键 | 功能 |
+|------|------|
+| `↑/k` | 向上移动 |
+| `↓/j` | 向下移动 |
+| `/` | 搜索过滤 |
+| `i` | 安装选中版本 |
+| `u` | 使用选中版本 |
+| `x` | 卸载选中版本 |
+| `q` | 退出 |
+| `?` | 查看帮助 |
+
+![TUI Demo](docs/images/ls.png)
+
+## 功能特性
+
+### 🎯 版本管理
+
+- **多版本共存**：安装任意数量的 Go 版本，互不干扰
+- **秒级切换**：通过符号链接实现版本切换，无需等待
+- **模糊匹配**：输入 `1.23` 自动匹配最新的 `1.23.x`
+- **版本筛选**：按 stable/unstable/archived 类型分类查看
+
+### 🖥️ 交互式 TUI
+
+基于 [Bubbletea](https://github.com/charmbracelet/bubbletea) 构建的现代终端界面：
+
+- 实时搜索过滤
+- 可视化版本列表
+- 进度条显示下载进度
+- 一键安装/切换/卸载
+
+![Install Progress](docs/images/install.png)
+
+### 🌐 镜像加速
+
+内置多个镜像源，解决国内下载慢的问题：
 
 ```bash
-# 卸载特定版本的Go
-gvm uninstall go1.21
+# 设置默认镜像
+gvm config set mirror https://mirrors.aliyun.com/golang/
+
+# 临时使用镜像（不保存配置）
+gvm list -r -m https://mirrors.ustc.edu.cn/golang/
 ```
-### 配置管理
+
+### 🔧 配置管理
 
 ```bash
-# 查看配置
-gvm config list
-
-# 获取配置
-gvm config get mirror
-
-# 设置配置
-gvm config set mirror https://golang.google.cn/dl/
-
-# 删除配置
-gvm config unset custom_setting
+gvm config list           # 查看所有配置
+gvm config get mirror     # 获取配置值
+gvm config set mirror URL # 设置配置
+gvm config unset key      # 删除配置
 ```
 
-### 创建新项目
+### 📦 项目创建
 
 ```bash
-# 使用当前活动的Go版本创建新项目
-gvm new myproject
-
-# 使用指定版本号创建新项目
-gvm new myproject -V 1.21.0
-
-# 指定module创建项目
-gvm new myproject -m github/xxx/myproject
-```
-
-### 配置管理
-
-```bash
-# 列出所有配置
-gvm config list
-
-# 获取特定配置
-gvm config get mirror
-
-# 设置配置
-gvm config set mirror https://golang.google.cn/dl/
-
-# 删除配置
-gvm config unset custom_setting
+gvm new myproject         # 使用当前版本创建项目
+gvm new myproject -V 1.21 # 指定 Go 版本
+gvm new myproject -m github.com/user/myproject  # 指定 module
 ```
 
 ## 命令参考
 
-| 命令              | 描述         |
-|-----------------|------------|
-| `gvm list`      | 列出Go版本     |
-| `gvm install`   | 安装Go版本     |
-| `gvm use`       | 切换到特定Go版本  |
-| `gvm uninstall` | 卸载Go版本     |
-| `gvm new`       | 创建新Go项目    |
-| `gvm upgrade`   | 升级最新的gvm版本 |
-| `gvm config`    | 管理GVM配置    |
+| 命令 | 描述 | 示例 |
+|------|------|------|
+| `gvm list` | 列出版本 | `gvm list -r -t stable` |
+| `gvm install` | 安装版本 | `gvm install 1.23` |
+| `gvm use` | 切换版本 | `gvm use go1.21.0` |
+| `gvm uninstall` | 卸载版本 | `gvm uninstall 1.20` |
+| `gvm new` | 创建项目 | `gvm new myapp -V 1.21` |
+| `gvm upgrade` | 升级 GVM | `gvm upgrade` |
+| `gvm config` | 管理配置 | `gvm config set mirror URL` |
 
-更详细的命令说明请参考[命令文档](docs/cli/gvm.md)。
+详细命令说明请参阅 [命令文档](docs/cli/gvm.md)。
 
-## 项目结构
+## 镜像源
+
+| 镜像 | URL | 说明 |
+|------|-----|------|
+| 官方 | `https://go.dev/dl/` | 官方源，可能较慢 |
+| 中国官方 | `https://golang.google.cn/dl/` | 国内官方镜像 |
+| 阿里云 | `https://mirrors.aliyun.com/golang/` | 推荐 |
+| 中科大 | `https://mirrors.ustc.edu.cn/golang/` | 推荐 |
+| 华中科大 | `https://mirrors.hust.edu.cn/golang/` | 高校镜像 |
+| 南京大学 | `https://mirrors.nju.edu.cn/golang/` | 高校镜像 |
+
+## 工作原理
+
+GVM 通过符号链接管理 Go 版本：
 
 ```
-├── cmd/           # 命令行工具实现
-├── docs/          # 文档
-│   └── cli/       # 命令行文档
-├── internal/      # 内部包
-│   ├── consts/    # 常量定义
-│   ├── registry/  # 版本注册表
-│   ├── version/   # 版本管理
-│   └── utils/     # 工具函数
-└── pkg/           # 公共包
+~/.gvm/
+├── go          → 符号链接指向当前使用的版本
+├── sdk/
+│   ├── go1.21.0/   # Go 1.21.0 安装目录
+│   ├── go1.22.0/   # Go 1.22.0 安装目录
+│   └── go1.23.0/   # Go 1.23.0 安装目录
+├── config.yaml     # GVM 配置文件
+└── gvm             # GVM 二进制文件
 ```
-## 🧭 开发路线图
 
-| 阶段      | 功能 | 状态 |
-|---------|------|------|
-| ✅ v1.0  | 基础命令体系 (list/install/use/uninstall/config) | 已完成 |
-| 🚧 v1.2 | `.gvmrc` 项目版本隔离 | 开发中 |
-| 🚧 v1.3 | `gvm doctor` 环境诊断工具 | 计划中 |
-| 🧩 v1.4 | Shell 自动补全、项目模板系统 | 计划中 |
-| 🧠 v2.0 | 插件系统与智能版本推荐 | 规划中 |
+环境变量：
+- `GOROOT` → `~/.gvm/go`（当前版本的符号链接）
+- `GOPATH` → `~/go`（默认，可自定义）
+- `PATH` → 包含 `~/.gvm/go/bin`
+
+## 开发路线图
+
+| 版本 | 功能 | 状态 |
+|------|------|------|
+| v1.0 | 核心命令体系 | ✅ 已完成 |
+| v1.1 | 交互式 TUI | ✅ 已完成 |
+| v1.2 | `.gvmrc` 项目版本隔离 | 🚧 开发中 |
+| v1.3 | `gvm doctor` 环境诊断 | 📋 计划中 |
+| v1.4 | Shell 自动补全 | 📋 计划中 |
+| v2.0 | 插件系统 | 💡 规划中 |
+
 ## 贡献
 
-欢迎贡献代码、报告问题或提出改进建议！请遵循以下步骤：
+欢迎参与 GVM 的开发！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解贡献流程。
 
-1. Fork 项目
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建Pull Request
+### 开发者快速开始
+
+```bash
+# 克隆仓库
+git clone https://github.com/the-yex/gvm.git && cd gvm
+
+# 安装依赖
+go mod download
+
+# 本地构建
+go build -o gvm .
+
+# 运行测试
+go test ./...
+```
+
+## 社区
+
+- **问题反馈**：[GitHub Issues](https://github.com/the-yex/gvm/issues)
+- **功能建议**：[GitHub Discussions](https://github.com/the-yex/gvm/discussions)
+- **邮件联系**：1003941268@qq.com
+
+## 致谢
+
+GVM 的开发离不开以下开源项目：
+
+- [Cobra](https://github.com/spf13/cobra) - CLI 框架
+- [Bubbletea](https://github.com/charmbracelet/bubbletea) - TUI 框架
+- [Viper](https://github.com/spf13/viper) - 配置管理
+- [archiver](https://github.com/mholt/archiver) - 压缩包处理
 
 ## 许可证
 
-本项目采用MIT许可证 - 详情请参阅[LICENSE](LICENSE)文件。
+本项目采用 [MIT 许可证](LICENSE)。
 
-## 联系方式
+---
 
-如有任何问题或建议，请通过以下方式联系我们：
-
-- 项目维护者：[mortal](1003941268@qq.com)
-- GitHub Issues：[https://github.com/the-yex/gvm/issues](https://github.com/the-yex/gvm/issues)
+<p align="center">
+  如果 GVM 对你有帮助，请给项目一个 ⭐ Star 支持一下！
+</p>

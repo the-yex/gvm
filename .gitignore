@@ -5,3 +5,5 @@ dist
 .venv
 todo.md
 gvm
+.claude
+CLAUDE.md

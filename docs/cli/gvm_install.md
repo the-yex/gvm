@@ -1,33 +1,48 @@
 ## gvm install
 
-A brief description of your command
+安装指定的 Go 版本
 
-### Synopsis
+### 使用方法
 
-A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.
-
-```
-gvm install [flags]
+```bash
+gvm install <version> [flags]
 ```
 
-### Options
+### 参数说明
 
+| 参数 | 说明 |
+|------|------|
+| `version` | 要安装的 Go 版本号，支持多种格式 |
+
+### 版本格式
+
+GVM 支持灵活的版本指定方式：
+
+```bash
+gvm install 1.23        # 安装最新的 1.23.x 版本
+gvm install 1.23.0      # 安装精确版本 1.23.0
+gvm install go1.23.0    # 带 go 前缀的版本号
+gvm install latest      # 安装最新稳定版本
 ```
-  -h, --help   help for install
+
+### 使用示例
+
+```bash
+# 安装最新的 Go 1.21 版本
+gvm install 1.21
+
+# 安装指定的 Go 1.21.0 版本
+gvm install go1.21.0
+
+# 安装最新的稳定版本
+gvm install latest
+
+# 安装完成后自动切换
+gvm install 1.22 && gvm use 1.22
 ```
 
-### Options inherited from parent commands
+### 相关命令
 
-```
-  -v, --verbose   verbose output
-```
-
-### SEE ALSO
-
-* [gvm](gvm.md)	 - Go version manager for installing and switching between multiple Go versions
-
+- [gvm list](gvm_list.md) - 查看可用版本
+- [gvm use](gvm_use.md) - 切换版本
+- [gvm uninstall](gvm_uninstall.md) - 卸载版本

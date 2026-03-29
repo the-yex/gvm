@@ -1,32 +1,39 @@
 ## gvm upgrade
 
-Upgrade gvm to the latest version
+将 GVM 升级到最新版本
 
-### Synopsis
+### 使用方法
 
-Check for a newer release of gvm and upgrade automatically if available.
-
-Examples:
-  gvm upgrade     # checks and upgrades to the latest release
-
-
-```
+```bash
 gvm upgrade [flags]
 ```
 
-### Options
+### 说明
 
+此命令会从 GitHub Releases 下载最新的 GVM 版本，并自动替换当前安装。
+
+### 使用示例
+
+```bash
+# 升级到最新版本
+gvm upgrade
+
+# 查看当前版本
+gvm --version
 ```
-  -h, --help   help for upgrade
-```
 
-### Options inherited from parent commands
+### 升级流程
 
-```
-  -v, --verbose   verbose output
-```
+1. 检查 GitHub Releases 获取最新版本
+2. 下载对应平台的压缩包
+3. 替换 `~/.gvm/gvm` 二进制文件
+4. 清理临时文件
 
-### SEE ALSO
+### 注意事项
 
-* [gvm](gvm.md)	 - Go version manager for installing and switching between multiple Go versions
+- 升级过程中不影响已安装的 Go 版本
+- 建议定期升级以获取最新功能和修复
 
+### 相关命令
+
+- [gvm config](gvm_config.md) - 配置镜像源影响下载速度
