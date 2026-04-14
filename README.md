@@ -290,22 +290,13 @@ GVM 通过符号链接管理 Go 版本：
 ## 维护者发版
 
 ```bash
-# 1. 提交代码并打 tag
-git add .
-git commit -m "release: v1.2.2"
-git tag v1.2.2
-git push origin main
-git push origin v1.2.2
-
-# 2. 构建发布包
-./build.sh 1.2.2
-
-# 3. 发布 GitHub Release
-gh release create v1.2.2 dist/* --title "v1.2.2"
+# 一键执行测试、打包、打 tag、push、创建 GitHub Release
+./scripts/release.sh 1.2.2
 ```
 
 现在的发布流程有两个特点：
 
+- `scripts/release.sh` 会串起测试、构建、tag、push、Release 创建
 - `build.sh` 会在构建时自动注入版本号，不需要手动改源码常量
 - `install.sh` 会自动解析最新 release，发布成功后安装脚本立即生效
 

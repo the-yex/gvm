@@ -218,13 +218,13 @@ PR 标题应遵循提交规范格式。
 维护者发布新版本时，建议按以下顺序执行：
 
 1. 更新 `CHANGELOG.md`
-2. 确认测试通过：`go test ./...`
-3. 提交 release commit，并创建 `vX.Y.Z` tag
-4. 执行 `./build.sh X.Y.Z` 生成多平台发布包
-5. 使用 `gh release create vX.Y.Z dist/* --title "vX.Y.Z"` 发布到 GitHub
+2. 提交 release commit
+3. 执行 `./scripts/release.sh X.Y.Z`
 
 说明：
 
+- `scripts/release.sh` 默认会执行 `go test ./...`、调用 `./build.sh`、创建 tag、push 到远端并创建 GitHub Release
+- 如需自定义 release notes，可使用 `./scripts/release.sh X.Y.Z --notes-file release-notes.md`
 - `build.sh` 会在构建时通过 `ldflags` 注入版本号，不需要手动修改 Go 源码中的版本常量
 - 如果仓库已经存在最新 tag，`./build.sh` 也可以直接读取 tag 作为版本号
 - `install.sh` 默认会自动解析最新 release，因此 release 发布成功后，安装脚本无需额外改动
