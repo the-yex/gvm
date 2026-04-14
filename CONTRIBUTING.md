@@ -10,6 +10,7 @@
 - [代码规范](#代码规范)
 - [提交规范](#提交规范)
 - [Pull Request 流程](#pull-request-流程)
+- [发布流程](#发布流程)
 
 ## 行为准则
 
@@ -70,6 +71,22 @@ go test ./...
 
 # Run with race detection
 go test -race ./...
+```
+
+### 本地验证升级与安装
+
+```bash
+# 验证 CLI 可正常运行
+go run . --version
+
+# 验证升级命令帮助
+go run . upgrade --help
+
+# 检查安装脚本语法
+bash -n install.sh
+
+# 检查构建脚本语法
+bash -n build.sh
 ```
 
 ### 项目结构
@@ -195,6 +212,22 @@ PR 标题应遵循提交规范格式。
 
 - 使用 squash merge 保持历史整洁
 - PR 合并后会自动关闭相关 Issue
+
+## 发布流程
+
+维护者发布新版本时，建议按以下顺序执行：
+
+1. 更新 `CHANGELOG.md`
+2. 确认测试通过：`go test ./...`
+3. 提交 release commit，并创建 `vX.Y.Z` tag
+4. 执行 `./build.sh X.Y.Z` 生成多平台发布包
+5. 使用 `gh release create vX.Y.Z dist/* --title "vX.Y.Z"` 发布到 GitHub
+
+说明：
+
+- `build.sh` 会在构建时通过 `ldflags` 注入版本号，不需要手动修改 Go 源码中的版本常量
+- 如果仓库已经存在最新 tag，`./build.sh` 也可以直接读取 tag 作为版本号
+- `install.sh` 默认会自动解析最新 release，因此 release 发布成功后，安装脚本无需额外改动
 
 ---
 

@@ -21,9 +21,17 @@ curl -sSL https://raw.githubusercontent.com/the-yex/gvm/main/install.sh | bash
 
 # Gitee 源（国内加速）
 curl -sSL https://raw.githubusercontent.com/the-yex/gvm/main/install.sh | bash -s -- --source gitee
+
+# 安装指定版本
+curl -sSL https://raw.githubusercontent.com/the-yex/gvm/main/install.sh | bash -s -- --version 1.2.2
 ```
 
 安装完成后重启终端，或执行 `source ~/.bashrc`（或 `~/.zshrc`）。
+
+安装脚本说明：
+- 默认自动安装最新 release
+- `--source gitee` 优先使用 Gitee，失败后回退 GitHub
+- `--version x.y.z` 可安装指定版本
 
 ### 快速示例
 
