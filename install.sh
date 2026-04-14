@@ -1,9 +1,63 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GVM_RELEASE="1.1.1"
 GVM_HOME="${HOME}/.gvm"
 SOURCE="github.com"
+RELEASE_VERSION=""
+
+fetch() {
+    if command -v curl >/dev/null 2>&1; then
+        curl -fsSL "$1"
+        return
+    fi
+    wget -qO- "$1"
+}
+
+normalize_version() {
+    local version="$1"
+    version="${version#v}"
+    printf '%s' "$version"
+}
+
+release_api_candidates() {
+    case "${SOURCE}" in
+        gitee.com)
+            printf '%s\n' \
+                "https://gitee.com/api/v5/repos/the-yex/gvm/releases/latest" \
+                "https://api.github.com/repos/the-yex/gvm/releases/latest"
+            ;;
+        *)
+            printf '%s\n' \
+                "https://api.github.com/repos/the-yex/gvm/releases/latest" \
+                "https://gitee.com/api/v5/repos/the-yex/gvm/releases/latest"
+            ;;
+    esac
+}
+
+resolve_release_version() {
+    if [[ -n "${RELEASE_VERSION}" ]]; then
+        normalize_version "${RELEASE_VERSION}"
+        return
+    fi
+
+    local release_api tag response
+    while IFS= read -r release_api; do
+        if [[ -z "${release_api}" ]]; then
+            continue
+        fi
+        if response="$(fetch "${release_api}" 2>/dev/null)"; then
+            tag="$(printf '%s' "${response}" | tr -d '\r' | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)"
+            if [[ -n "${tag}" ]]; then
+                normalize_version "${tag}"
+                return
+            fi
+        fi
+    done < <(release_api_candidates)
+
+    echo "Failed to resolve latest release version from release APIs" >&2
+    echo "You can pin a version manually with: ./install.sh --version 1.2.3" >&2
+    exit 1
+}
 # 获取系统架构
 get_arch() {
     case "$(uname -m)" in
@@ -37,6 +91,14 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;
+        --version)
+            shift
+            RELEASE_VERSION="$(normalize_version "${1:-}")"
+            if [[ -z "${RELEASE_VERSION}" ]]; then
+                echo "Missing value for --version" >&2
+                exit 1
+            fi
+            ;;
         *)
             echo "Unknown option: $1"
             exit 1
@@ -46,12 +108,14 @@ while [[ $# -gt 0 ]]; do
 done
 # 安装 gvm
 install_gvm() {
-    local os arch dest_file url
+    local os arch dest_file url resolved_version
     os=$(get_os)
     arch=$(get_arch)
-    dest_file="${GVM_HOME}/gvm${GVM_RELEASE}.${os}-${arch}.tar.gz"
-    url="https://${SOURCE}/the-yex/gvm/releases/download/v${GVM_RELEASE}/gvm${GVM_RELEASE}.${os}-${arch}.tar.gz"
+    resolved_version="$(resolve_release_version)"
+    dest_file="${GVM_HOME}/gvm${resolved_version}.${os}-${arch}.tar.gz"
+    url="https://${SOURCE}/the-yex/gvm/releases/download/v${resolved_version}/gvm${resolved_version}.${os}-${arch}.tar.gz"
 
+    echo "[0/3] Resolved gvm version ${resolved_version}"
     echo "[1/3] Downloading ${url}"
     mkdir -p "${GVM_HOME}"
     rm -f "${dest_file}"
@@ -98,6 +162,7 @@ EOF
     done
 
     echo -e "\nInstallation completed. Please restart your terminal or source your shell configuration file."
+    echo "Installed version: ${resolved_version}"
 }
 main() {
     install_gvm

@@ -61,6 +61,8 @@ type Asset struct {
 	BrowserDownloadURL string `json:"browser_download_url"`
 }
 
+type ProgressFunc func(written, total int64)
+
 func (a *Asset) Version() string {
 	re := regexp.MustCompile(`\d+\.\d+\.\d+`)
 	return re.FindString(a.Name)
@@ -73,6 +75,11 @@ func (a *Asset) IsCompressedFile() bool {
 
 // Download saves the remote resource to local file with progress support.
 func (a *Asset) Download() (size int64, err error) {
+	return a.DownloadWithProgress(nil)
+}
+
+// DownloadWithProgress saves the remote resource to a local file and reports download progress.
+func (a *Asset) DownloadWithProgress(onProgress ProgressFunc) (size int64, err error) {
 	url := a.BrowserDownloadURL
 	if source := os.Getenv("GVM_SOURCE"); source != "" {
 		url = strings.Replace(url, "gitlab", source, 1)
@@ -100,7 +107,21 @@ func (a *Asset) Download() (size int64, err error) {
 		return 0, err
 	}
 	defer f.Close()
-	return io.Copy(f, resp.Body)
+	if onProgress != nil {
+		onProgress(0, resp.ContentLength)
+	}
+	pw := &progressWriter{
+		total:      resp.ContentLength,
+		onProgress: onProgress,
+	}
+	size, err = io.Copy(io.MultiWriter(f, pw), resp.Body)
+	if err != nil {
+		return 0, err
+	}
+	if onProgress != nil {
+		onProgress(size, resp.ContentLength)
+	}
+	return size, nil
 }
 
 func (a *Asset) Unzip() error {
@@ -111,8 +132,23 @@ func (a *Asset) Clean() {
 		os.RemoveAll(a.tempDir)
 	}
 }
-func (a *Asset) Install() {
-	a.mv(filepath.Join(a.tempDir, "gvm"), filepath.Join(consts.GVM_HOME, "gvm"))
+func (a *Asset) Install() error {
+	src := filepath.Join(a.tempDir, "gvm")
+	dst := filepath.Join(consts.GVM_HOME, "gvm")
+	tmp := dst + ".tmp"
+
+	if err := a.mv(src, tmp); err != nil {
+		return err
+	}
+	if err := os.Chmod(tmp, 0755); err != nil {
+		_ = os.Remove(tmp)
+		return err
+	}
+	if err := os.Rename(tmp, dst); err != nil {
+		_ = os.Remove(tmp)
+		return err
+	}
+	return nil
 }
 func (a *Asset) mv(src, dst string) error {
 	in, err := os.Open(src)
@@ -130,6 +166,21 @@ func (a *Asset) mv(src, dst string) error {
 		return err
 	}
 	return out.Sync()
+}
+
+type progressWriter struct {
+	written    int64
+	total      int64
+	onProgress ProgressFunc
+}
+
+func (pw *progressWriter) Write(p []byte) (int, error) {
+	n := len(p)
+	pw.written += int64(n)
+	if pw.onProgress != nil {
+		pw.onProgress(pw.written, pw.total)
+	}
+	return n, nil
 }
 
 // ReleaseUpdater handles version update checks and operations.
@@ -170,8 +221,12 @@ func (up ReleaseUpdater) CheckForUpdates() (rel *Release, yes bool, err error) {
 	if err != nil {
 		return nil, false, err
 	}
-	if latestVersion.GreaterThan(semver.MustParse(consts.Version)) {
+	currentVersion, err := semver.NewVersion(strings.TrimPrefix(consts.Version, "v"))
+	if err != nil {
 		return &latest, true, nil
 	}
-	return nil, false, nil
+	if latestVersion.GreaterThan(currentVersion) {
+		return &latest, true, nil
+	}
+	return &latest, false, nil
 }

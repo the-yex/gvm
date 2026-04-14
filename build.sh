@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-RELEASE="${1:-1.0.0}"
+resolve_release() {
+    if [[ -n "${1:-}" ]]; then
+        printf '%s' "$1"
+        return
+    fi
+    if [[ -n "${GVM_RELEASE:-}" ]]; then
+        printf '%s' "${GVM_RELEASE}"
+        return
+    fi
+    if git_tag="$(git describe --tags --abbrev=0 2>/dev/null)"; then
+        printf '%s' "${git_tag#v}"
+        return
+    fi
+    echo "Unable to determine release version. Pass it explicitly: ./build.sh 1.2.3" >&2
+    exit 1
+}
+
+RELEASE="$(resolve_release "${1:-}")"
 
 TARGETS=(
     "darwin_amd64" "darwin_arm64"
@@ -11,6 +28,7 @@ TARGETS=(
 
 OUTPUT_DIR="./dist"
 SHA_FILE="${OUTPUT_DIR}/sha256sum.txt"
+VERSION_PKG="github.com/the-yex/gvm/internal/consts"
 
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
@@ -29,7 +47,7 @@ function package() {
     echo "[→] Building ${os}-${arch}..."
 
     GOOS="$os" GOARCH="$arch" CGO_ENABLED=0 GO111MODULE=on GOPROXY="https://goproxy.cn,direct" \
-        go build -o "$tmp_bin" .
+        go build -ldflags "-X ${VERSION_PKG}.Version=${release}" -o "$tmp_bin" .
 
     if [[ "$os" == "windows" ]]; then
         local pkg_name="gvm${release}.${os}-${arch}.zip"
@@ -45,6 +63,12 @@ function package() {
     echo "[✓] $pkg_name built"
 }
 
+
+if [[ ! "$RELEASE" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+    echo "Invalid release version: ${RELEASE}" >&2
+    echo "Usage: ./build.sh 1.2.3" >&2
+    exit 1
+fi
 
 echo "Building gvm version ${RELEASE} for multiple platforms..."
 echo "Output dir: $OUTPUT_DIR"

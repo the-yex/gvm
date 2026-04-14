@@ -14,10 +14,12 @@ import (
  */
 
 const (
-	NAME    = "gvm"
-	Version = "1.2.1"
-	AUTHOR  = "the-yex"
+	NAME   = "gvm"
+	AUTHOR = "the-yex"
 )
+
+// Version is injected at build time by build.sh. Local source builds fall back to dev.
+var Version = "dev"
 
 var (
 	GVM_HOME    string
