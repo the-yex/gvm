@@ -43,6 +43,17 @@ func (d delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 	if i.LocalDir() != "" {
 		data = fmt.Sprintf("%s  %s", data, i.LocalDir())
 	}
+	statusTags := []string{}
+	if i.CurrentUsed {
+		statusTags = append(statusTags, "当前")
+	} else if i.Installed {
+		statusTags = append(statusTags, "已安装")
+	}
+	if d.status != nil {
+		if status := d.status.Get(i.String()); status != "" {
+			statusTags = append(statusTags, status)
+		}
+	}
 
 	normal := lipgloss.NewStyle().PaddingLeft(3).Foreground(lipgloss.Color("#888888")) // 未安装灰色
 	local := lipgloss.NewStyle().PaddingLeft(3).Foreground(lipgloss.Color("#00FF00"))  // 已安装绿色
@@ -68,15 +79,13 @@ func (d delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 		}
 	case i.LocalDir() != "":
 		fn = local.Render
-
 	}
 
-	if d.status != nil {
-		if status := d.status.Get(i.String()); status != "" {
-			data = fmt.Sprintf("%s  %s", data, statusStyle.Render(status))
-		}
+	rendered := fn(data)
+	if len(statusTags) > 0 {
+		rendered = fmt.Sprintf("%s  %s", rendered, statusStyle.Render(strings.Join(statusTags, " · ")))
 	}
-	fmt.Fprint(w, fn(data))
+	fmt.Fprint(w, rendered)
 }
 
 type keyMap struct {

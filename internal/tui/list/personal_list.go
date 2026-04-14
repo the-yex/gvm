@@ -351,6 +351,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.list.RemoveItem(m.list.Index())
 		} else {
 			item.DirName = ""
+			item.Installed = false
 			m.list.SetItem(m.list.Index(), item)
 		}
 		return m, tea.Batch(m.list.NewStatusMessage(successMessageStyle("success uninstall " + item.String())))
