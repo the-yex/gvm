@@ -23,7 +23,9 @@ Example:
   gvm list
     Show all Go versions installed locally.
   gvm list -r
-    Show all available Go versions remotely.`,
+    Show all available Go versions remotely.
+  gvm list -r --refresh
+    Refresh the remote cache before listing.`,
 	Aliases: []string{"l", "ls"},
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		remote, _ := cmd.Flags().GetBool("remote")
@@ -38,7 +40,8 @@ Example:
 
 		timeout, _ := cmd.Flags().GetDuration("timeout")
 		mirrorFlag, _ := cmd.Flags().GetString("mirror")
-		opts := pkg.ListOption{Timeout: timeout, Mirror: mirrorFlag}
+		refresh, _ := cmd.Flags().GetBool("refresh")
+		opts := pkg.ListOption{Timeout: timeout, Mirror: mirrorFlag, Refresh: refresh}
 
 		versions, err := pkg.NewVManager(remote, pkg.WithLocal()).List(vk, opts)
 		if err != nil {
@@ -73,4 +76,5 @@ func init() {
 	listCmd.Flags().StringP("type", "t", string(consts.All), "Version type (default all): stable | unstable | archived ")
 	listCmd.Flags().DurationP("timeout", "T", 5*time.Second, "HTTP timeout for fetching remote versions")
 	listCmd.Flags().StringP("mirror", "m", "", "Override mirror URL (temporary, does not save to config)")
+	listCmd.Flags().Bool("refresh", false, "Force refresh remote version cache")
 }

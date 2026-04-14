@@ -8,6 +8,8 @@ package pkg
  */
 
 import (
+	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
@@ -37,6 +39,7 @@ import (
 type ListOption struct {
 	Timeout time.Duration
 	Mirror  string
+	Refresh bool
 }
 
 type VManager interface {
@@ -161,7 +164,6 @@ func (r remote) mergeInstalled(remoteVers []*version.Version, localVers []*versi
 		m[v.String()] = v // 用原始版本号做 key
 	}
 	for _, v := range remoteVers {
-		v.Path = consts.VERSION_DIR
 		if lv, ok := m[v.String()]; ok {
 			v.Installed = true
 			v.CurrentUsed = lv.CurrentUsed
@@ -172,36 +174,57 @@ func (r remote) mergeInstalled(remoteVers []*version.Version, localVers []*versi
 }
 
 func (r remote) List(kind consts.VersionKind, opts ListOption) (versions []*version.Version, err error) {
-	p := core.NewSpinnerProgram(tea.WithAltScreen())
-	wg := sync.WaitGroup{}
-	wg.Go(func() {
-		p.Run()
-	})
-	regOpts := registry.RegistryOption{Timeout: opts.Timeout, Mirror: opts.Mirror}
-	if regOpts.Timeout == 0 {
-		regOpts.Timeout = 5 * time.Second
+	mirrorURL := resolveMirrorURL(opts)
+	cacheHit := false
+	setRemoteCacheInfo(RemoteCacheInfo{Mirror: mirrorURL, Forced: opts.Refresh})
+	if !opts.Refresh {
+		if cached, createdAt, ok, cacheErr := loadRemoteCache(mirrorURL); ok && cacheErr == nil {
+			versions = cached
+			cacheHit = true
+			setRemoteCacheInfo(RemoteCacheInfo{Mirror: mirrorURL, Used: true, Created: createdAt})
+		}
 	}
-	rg, err := registry.NewRegistry(regOpts)
-	if err != nil {
-		return nil, err
+
+	if !cacheHit {
+		p := core.NewSpinnerProgram(tea.WithAltScreen())
+		wg := sync.WaitGroup{}
+		wg.Go(func() {
+			p.Run()
+		})
+		regOpts := registry.RegistryOption{Timeout: opts.Timeout, Mirror: mirrorURL}
+		if regOpts.Timeout == 0 {
+			regOpts.Timeout = 5 * time.Second
+		}
+		rg, err := registry.NewRegistry(regOpts)
+		if err != nil {
+			p.Send(tea.Quit())
+			wg.Wait()
+			return nil, err
+		}
+		switch kind {
+		case consts.Stable:
+			versions, err = rg.StableVersions()
+		case consts.Unstable:
+			versions, err = rg.UnstableVersions()
+		case consts.Archived:
+			versions, err = rg.ArchivedVersions()
+		default:
+			versions, err = rg.AllVersions()
+		}
+		saveRemoteCache(mirrorURL, versions)
+		setRemoteCacheInfo(RemoteCacheInfo{Mirror: mirrorURL, Used: false, Created: time.Now(), Forced: opts.Refresh})
+		p.Send(tea.Quit())
+		wg.Wait()
+		if err != nil {
+			return nil, err
+		}
 	}
-	switch kind {
-	case consts.Stable:
-		versions, err = rg.StableVersions()
-	case consts.Unstable:
-		versions, err = rg.UnstableVersions()
-	case consts.Archived:
-		versions, err = rg.ArchivedVersions()
-	default:
-		versions, err = rg.AllVersions()
-	}
+
 	if r.withLocal {
 		installVersions, _ := local{}.List(kind, opts)
 		r.mergeInstalled(versions, installVersions)
 	}
-	p.Send(tea.Quit())
-	wg.Wait()
-	return versions, err
+	return versions, nil
 }
 
 func (r remote) Install(versionName string) error {
@@ -306,6 +329,94 @@ func LocalInstalled(versionName string) *version.Version {
 	}
 
 	return nil
+}
+
+const remoteCacheTTL = 10 * time.Minute
+
+func resolveMirrorURL(opts ListOption) string {
+	mirror := opts.Mirror
+	if mirror == "" {
+		mirror = viper.GetString(consts.CONFIG_MIRROR)
+	}
+	if mirror == "" {
+		mirror = consts.DEFAULT_MIRROR
+	}
+	return mirror
+}
+
+type remoteCacheVersion struct {
+	Original  string                 `json:"original"`
+	Artifacts []version.ArtifactInfo `json:"artifacts"`
+}
+
+type remoteCacheFile struct {
+	CreatedAt time.Time            `json:"created_at"`
+	Mirror    string               `json:"mirror"`
+	Versions  []remoteCacheVersion `json:"versions"`
+}
+
+func cacheFilePath(mirror string) string {
+	sum := sha256.Sum256([]byte(mirror))
+	filename := fmt.Sprintf("versions_%x.json", sum[:8])
+	return filepath.Join(consts.CACHE_DIR, filename)
+}
+
+func loadRemoteCache(mirror string) ([]*version.Version, time.Time, bool, error) {
+	path := cacheFilePath(mirror)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, time.Time{}, false, nil
+		}
+		return nil, time.Time{}, false, err
+	}
+	var cache remoteCacheFile
+	if err := json.Unmarshal(data, &cache); err != nil {
+		return nil, time.Time{}, false, err
+	}
+	if time.Since(cache.CreatedAt) > remoteCacheTTL {
+		return nil, time.Time{}, false, nil
+	}
+	var versions []*version.Version
+	for _, entry := range cache.Versions {
+		v, err := version.NewGoVersion(entry.Original)
+		if err != nil {
+			continue
+		}
+		v.Artifacts = entry.Artifacts
+		versions = append(versions, v)
+	}
+	if len(versions) == 0 {
+		return nil, time.Time{}, false, nil
+	}
+	return versions, cache.CreatedAt, true, nil
+}
+
+func saveRemoteCache(mirror string, versions []*version.Version) {
+	if len(versions) == 0 {
+		return
+	}
+	entries := make([]remoteCacheVersion, 0, len(versions))
+	for _, v := range versions {
+		entries = append(entries, remoteCacheVersion{
+			Original:  v.Original(),
+			Artifacts: v.Artifacts,
+		})
+	}
+	cache := remoteCacheFile{
+		CreatedAt: time.Now(),
+		Mirror:    mirror,
+		Versions:  entries,
+	}
+	data, err := json.Marshal(cache)
+	if err != nil {
+		return
+	}
+	path := cacheFilePath(mirror)
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return
+	}
+	_ = os.WriteFile(path, data, 0644)
 }
 
 func hasPatchComponent(ver string) bool {
