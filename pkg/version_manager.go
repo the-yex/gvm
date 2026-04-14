@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -245,8 +246,7 @@ func (r remote) MultiWriterInstall(item any, writer io.Writer, fn func(int642 in
 }
 
 func (r remote) Uninstall(version string) error {
-	//TODO implement me
-	return errors.New("not support")
+	return local{}.Uninstall(version)
 }
 
 /*
@@ -273,10 +273,46 @@ func LocalInstalled(versionName string) *version.Version {
 		return nil
 	}
 	installVersions, _ := local{}.List(consts.All, ListOption{})
+	cleaned := strings.TrimSpace(strings.TrimPrefix(versionName, "go"))
+
 	for _, installVersion := range installVersions {
-		if installVersion.String() == versionName {
+		if installVersion.String() == versionName || installVersion.String() == cleaned {
 			return installVersion
 		}
 	}
+
+	target, err := version.NewVersion(cleaned)
+	if err != nil {
+		return nil
+	}
+
+	for _, installVersion := range installVersions {
+		if installVersion.Equal(target) {
+			return installVersion
+		}
+	}
+
+	if !hasPatchComponent(cleaned) {
+		var matches []*version.Version
+		for _, installVersion := range installVersions {
+			if installVersion.Major() == target.Major() && installVersion.Minor() == target.Minor() {
+				matches = append(matches, installVersion)
+			}
+		}
+		if len(matches) > 0 {
+			sort.Sort(version.Collection(matches))
+			return matches[len(matches)-1]
+		}
+	}
+
 	return nil
+}
+
+func hasPatchComponent(ver string) bool {
+	if ver == "" {
+		return false
+	}
+	trimmed := strings.SplitN(ver, "-", 2)[0]
+	trimmed = strings.SplitN(trimmed, "+", 2)[0]
+	return len(strings.Split(trimmed, ".")) >= 3
 }

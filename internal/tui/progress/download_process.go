@@ -127,6 +127,29 @@ func (m *Model) View() string {
 		formatSpeed(m.speed), formatETA(m.remain), sizeInfo))
 }
 
+func (m *Model) CurrentSpeed() float64 {
+	return m.speed
+}
+
+func (m *Model) Remaining() time.Duration {
+	return m.remain
+}
+
+func (m *Model) WrittenBytes() int64 {
+	return m.written
+}
+
+func (m *Model) TotalBytes() int64 {
+	return m.totalBytes
+}
+
+func (m *Model) Ratio() float64 {
+	if m.totalBytes == 0 {
+		return 0
+	}
+	return float64(m.written) / float64(m.totalBytes)
+}
+
 func formatSpeed(speed float64) string {
 	if speed >= 1024*1024 {
 		return fmt.Sprintf("%.2f MB/s", speed/1024/1024)

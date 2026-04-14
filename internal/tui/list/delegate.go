@@ -18,7 +18,16 @@ import (
 * @Package:
  */
 type delegate struct {
-	keys *keyMap
+	keys   *keyMap
+	status statusAccessor
+}
+
+var statusStyle = lipgloss.NewStyle().
+	Foreground(lipgloss.Color("#5BC0DE")).
+	PaddingLeft(2)
+
+type statusAccessor interface {
+	Get(key string) string
 }
 
 func (d delegate) Height() int                             { return 1 }
@@ -62,6 +71,11 @@ func (d delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 
 	}
 
+	if d.status != nil {
+		if status := d.status.Get(i.String()); status != "" {
+			data = fmt.Sprintf("%s  %s", data, statusStyle.Render(status))
+		}
+	}
 	fmt.Fprint(w, fn(data))
 }
 
@@ -69,6 +83,7 @@ type keyMap struct {
 	install   key.Binding
 	uninstall key.Binding
 	use       key.Binding
+	retry     key.Binding
 }
 
 func (d keyMap) ShortHelp() []key.Binding {
@@ -76,6 +91,7 @@ func (d keyMap) ShortHelp() []key.Binding {
 		d.install,
 		d.uninstall,
 		d.use,
+		d.retry,
 	}
 }
 
@@ -85,6 +101,7 @@ func (d keyMap) FullHelp() [][]key.Binding {
 			d.install,
 			d.uninstall,
 			d.use,
+			d.retry,
 		},
 	}
 }
@@ -102,5 +119,9 @@ func newKeyMap() *keyMap {
 		use: key.NewBinding(
 			key.WithKeys("u"),
 			key.WithHelp("u", "use")),
+		retry: key.NewBinding(
+			key.WithKeys("r"),
+			key.WithHelp("r", "retry"),
+		),
 	}
 }

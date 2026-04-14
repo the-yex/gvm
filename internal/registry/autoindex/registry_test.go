@@ -2,6 +2,7 @@ package autoindex
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 )
@@ -15,13 +16,17 @@ import (
 const OfficialDownloadPageURL = "https://mirrors.ustc.edu.cn/golang/"
 
 func Test_Parse(t *testing.T) {
+	if os.Getenv("GVM_NETWORK_TEST") != "1" {
+		t.Skip("skipping network-dependent registry parsing test (set GVM_NETWORK_TEST=1 to enable)")
+	}
+
 	r, err := NewRegistry(OfficialDownloadPageURL, 10*time.Second)
-	if nil != err {
-		panic(err)
+	if err != nil {
+		t.Fatalf("failed to create registry: %v", err)
 	}
 	versions, err := r.AllVersions()
 	if err != nil {
-		panic(err)
+		t.Fatalf("failed to list versions: %v", err)
 	}
 	for _, version := range versions {
 		fmt.Println(version.String())

@@ -6,6 +6,7 @@ package cmd
 import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/the-yex/gvm/internal/consts"
 	list2 "github.com/the-yex/gvm/internal/tui/list"
 	"github.com/the-yex/gvm/pkg"
@@ -36,8 +37,8 @@ Example:
 		}
 
 		timeout, _ := cmd.Flags().GetDuration("timeout")
-		mirror, _ := cmd.Flags().GetString("mirror")
-		opts := pkg.ListOption{Timeout: timeout, Mirror: mirror}
+		mirrorFlag, _ := cmd.Flags().GetString("mirror")
+		opts := pkg.ListOption{Timeout: timeout, Mirror: mirrorFlag}
 
 		versions, err := pkg.NewVManager(remote, pkg.WithLocal()).List(vk, opts)
 		if err != nil {
@@ -52,7 +53,16 @@ Example:
 		if remote {
 			title = list2.Remote
 		}
-		list2.NewListProgram(items, title).Run()
+		mirrorDisplay := mirrorFlag
+		if mirrorDisplay == "" {
+			mirrorDisplay = viper.GetString(consts.CONFIG_MIRROR)
+		}
+		footer := list2.FooterInfo{
+			Mirror:  mirrorDisplay,
+			Timeout: timeout,
+			Remote:  remote,
+		}
+		list2.NewListProgram(items, title, footer).Run()
 		return nil
 	},
 }

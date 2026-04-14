@@ -6,6 +6,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/the-yex/gvm/internal/core"
+	"github.com/the-yex/gvm/pkg"
 )
 
 // uninstallCmd represents the uninstall command
@@ -22,13 +23,18 @@ This command will delete the corresponding Go version directory
 from your installation path.`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-
-		err := core.UninstallVersion(args[0])
+		version := args[0]
+		v := pkg.LocalInstalled(version)
+		if v == nil {
+			cmd.Printf("Version %q is not installed. Install it with \"gvm install %s\" first.\n", version, version)
+			return
+		}
+		err := core.UninstallVersion(v.LocalDir())
 		if err != nil {
 			cmd.PrintErrln(err.Error())
 			return
 		}
-		cmd.Printf("Uninstalled %s successfully\n", args[0])
+		cmd.Printf("Uninstalled %s successfully\n", version)
 	},
 }
 

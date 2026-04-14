@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/the-yex/gvm/internal/consts"
 	"github.com/the-yex/gvm/pkg"
 	"os"
 	"regexp"
@@ -35,16 +34,21 @@ Examples:
 		} else {
 			version = args[0]
 		}
-		localVersions, _ := pkg.NewVManager(false).List(consts.All, pkg.ListOption{})
-		for _, localVersion := range localVersions {
-			if localVersion.String() == version {
-				if err := pkg.SwitchVersion(localVersion.LocalDir()); err != nil {
-					cmd.Println(err.Error())
-				}
-				return
-			}
+
+		if version == "" {
+			cmd.Println("please specify a version or ensure go.mod contains a valid go version")
+			return
 		}
-		cmd.Printf("Version %q not found. use  \"gvm install %s\" first\n", version, version)
+
+		localVersion := pkg.LocalInstalled(version)
+		if localVersion == nil {
+			cmd.Printf("Version %q not found. use  \"gvm install %s\" first\n", version, version)
+			return
+		}
+
+		if err := pkg.SwitchVersion(localVersion.LocalDir()); err != nil {
+			cmd.Println(err.Error())
+		}
 	},
 }
 

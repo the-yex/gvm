@@ -13,25 +13,28 @@ import (
 * @Package:
  */
 func TestCheck(t *testing.T) {
+	if os.Getenv("GVM_NETWORK_TEST") != "1" {
+		t.Skip("skipping network-dependent release test (set GVM_NETWORK_TEST=1 to enable)")
+	}
+
 	i, y, err := NewReleaseUpdater().CheckForUpdates()
 	if err != nil {
-		t.Error(err)
+		t.Fatalf("check for updates failed: %v", err)
+	}
+	if !y {
+		t.Log("no new release found")
 		return
 	}
-	if y {
-		assert, err := i.FindAsset()
-		if err != nil {
-			t.Error(err)
-			return
-		}
-		defer assert.Clean()
-		os.Setenv("http_proxy", "127.0.0.1:7890")
-		os.Setenv("https_proxy", "127.0.0.1:7890")
-		fmt.Println(assert.Download())
-		fmt.Println(assert.Unzip())
-		assert.Install()
-		fmt.Println(assert)
-	} else {
-		fmt.Println("not need to upgrade")
+
+	assert, err := i.FindAsset()
+	if err != nil {
+		t.Fatalf("find asset failed: %v", err)
 	}
+	defer assert.Clean()
+	os.Setenv("http_proxy", "127.0.0.1:7890")
+	os.Setenv("https_proxy", "127.0.0.1:7890")
+	fmt.Println(assert.Download())
+	fmt.Println(assert.Unzip())
+	assert.Install()
+	fmt.Println(assert)
 }
