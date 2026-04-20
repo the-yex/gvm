@@ -90,6 +90,7 @@ while [[ $# -gt 0 ]]; do
                 echo "Unknown source: $1. Use 'gitee' or 'github'."
                 exit 1
             fi
+            shift
             ;;
         --version)
             shift
@@ -98,13 +99,13 @@ while [[ $# -gt 0 ]]; do
                 echo "Missing value for --version" >&2
                 exit 1
             fi
+            shift
             ;;
         *)
             echo "Unknown option: $1"
             exit 1
             ;;
     esac
-    shift
 done
 # 安装 gvm
 install_gvm() {
